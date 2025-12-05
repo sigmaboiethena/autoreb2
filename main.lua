@@ -332,6 +332,13 @@ local function sellCheapest(plot)
                     local success = firePrompt(e.prompt, 1, Enum.KeyCode.F, 3.5)
                     task.wait(0.5)
                     Sell:FireServer(e.index)
+                    print("sell ", e.index)
+                    task.spawn(function()
+                        for i=1,3 do
+                            task.wait(0.5)
+                            Sell:FireServer(e.index)
+                        end
+                    end)
                     if success then break end
                 end
                 retries += 1
