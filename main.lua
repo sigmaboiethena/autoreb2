@@ -320,6 +320,7 @@ local function sellCheapest(plot)
         end
     end
     table.sort(entries, function(a,b) return a.price < b.price end)
+    print(#entries)
     if #entries==0 then return end
 
     local cheapest = entries[1].price
@@ -500,7 +501,6 @@ while true do
             local animals = getMovingAnimals()
             for _, entry in ipairs(animals) do
                 local y = math.abs(entry.part.Orientation.Y)
-                print(y)
                 if not y then 
                     print('no orientation???/')
                 end
