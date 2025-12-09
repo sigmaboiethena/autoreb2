@@ -10,14 +10,14 @@ local player = Players.LocalPlayer
 
 
 local character = player.Character or player.CharacterAdded:Wait()
--- local humanoid = character:WaitForChild("Humanoid")
--- local backpack = player:WaitForChild("Backpack")
+local humanoid = character:WaitForChild("Humanoid")
+local backpack = player:WaitForChild("Backpack")
 
 local net = require(RS.Packages.Net);
 local Sell = net:RemoteEvent("PlotService/Sell");
--- local CastEvent = net:RemoteEvent("FishingRod.Cast")
--- local CancelEvent = net:RemoteEvent("FishingRod.Cancel")
--- local MinigameClick = net:RemoteEvent("FishingRod.MinigameClick")
+local CastEvent = net:RemoteEvent("FishingRod.Cast")
+local CancelEvent = net:RemoteEvent("FishingRod.Cancel")
+local MinigameClick = net:RemoteEvent("FishingRod.MinigameClick")
 local ClaimEvent = net:RemoteFunction("AdventService/ClaimReward");
 
 local function waitForPath(parent, ...)
