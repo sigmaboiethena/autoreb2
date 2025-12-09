@@ -375,43 +375,43 @@ local function rebirth()
     end
 end
 
--- local function hasTool(toolName)
---     return backpack:FindFirstChild(toolName) ~= nil
--- end
+local function hasTool(toolName)
+    return backpack:FindFirstChild(toolName) ~= nil
+end
 
--- local function equipTool(toolName)
---     local tool = backpack:FindFirstChild(toolName)
---     if tool then
---         humanoid:EquipTool(tool)
---         return tool
---     end
---     return nil
--- end
+local function equipTool(toolName)
+    local tool = backpack:FindFirstChild(toolName)
+    if tool then
+        humanoid:EquipTool(tool)
+        return tool
+    end
+    return nil
+end
 
--- local function autoFish()
---     local fishingRod = equipTool("Fishing Rod")
---     if not fishingRod then
---         print("No fishing rod in eq (Is flood active?)")
---         return
---     end
---     fishingRod:Activate()
---     task.wait(2)
---     CastEvent:FireServer(1)
+local function autoFish()
+    local fishingRod = equipTool("Fishing Rod")
+    if not fishingRod then
+        print("No fishing rod in eq (Is flood active?)")
+        return
+    end
+    fishingRod:Activate()
+    task.wait(2)
+    CastEvent:FireServer(1)
 
---     repeat 
---         task.wait(0.1)
---     until fishingRod:GetAttribute("minigame")
+    repeat 
+        task.wait(0.1)
+    until fishingRod:GetAttribute("minigame")
 
---     while fishingRod:GetAttribute("minigame") do
---         if fishingRod:GetAttribute("minigame") then
---             MinigameClick:FireServer()
---         end
---         task.wait(0.1)
---     end
---     task.wait(0.5)
---     humanoid:UnequipTools()
---     -- CancelEvent:FireServer()
--- end
+    while fishingRod:GetAttribute("minigame") do
+        if fishingRod:GetAttribute("minigame") then
+            MinigameClick:FireServer()
+        end
+        task.wait(0.1)
+    end
+    task.wait(0.5)
+    humanoid:UnequipTools()
+    -- CancelEvent:FireServer()
+end
 
 local myPlot = ensureMyPlot()
 task.wait(1)
@@ -430,20 +430,20 @@ while true do
         task.wait(1)
     end
 
-    if cashValue.Value < 500000 then
-        for i=1, 6 do
-            ClaimEvent:InvokeServer("Calendar", i);
-            task.wait(0.2)
-        end
-        task.wait(0.1)
-        sellCheapest(myPlot)
-        -- task.wait(5)
-    end
+    -- if cashValue.Value < 500000 then
+    --     for i=1, 6 do
+    --         ClaimEvent:InvokeServer("Calendar", i);
+    --         task.wait(0.2)
+    --     end
+    --     task.wait(0.1)
+    --     sellCheapest(myPlot)
+    --     -- task.wait(5)
+    -- end
 
-    while cashValue.Value < 500000 do
-        task.wait(1)
-        sellCheapest(myPlot)
-    end
+    -- while cashValue.Value < 500000 do
+    --     task.wait(1)
+    --     sellCheapest(myPlot)
+    -- end
 
     -- while not hasTool("Fishing Rod") do
     --     print("Flood not active...")
@@ -451,35 +451,35 @@ while true do
     -- end
     -- print("Flood started")
 
-    -- while cashValue.Value < 500000 do
-    --     local lockButton = myPlot:WaitForChild("Purchases"):FindFirstChild("PlotBlock"):FindFirstChild("Main")
-    --     -- if isBasePart(lockButton) then
-    --     --     walkToDynamic(lockButton, 3, 10)
-    --     -- end
-    --     task.wait(1)
-    --     -- spamJump(3)
-    --     -- if countOwned(myPlot) > 0 then 
-    --         -- task.spawn(function() sellCheapest(myPlot) end)
-    --         -- task.wait(6)
-    --         -- print('collected coins')
-    --     -- end
+    while cashValue.Value < 500000 do
+        local lockButton = myPlot:WaitForChild("Purchases"):FindFirstChild("PlotBlock"):FindFirstChild("Main")
+        -- if isBasePart(lockButton) then
+        --     walkToDynamic(lockButton, 3, 10)
+        -- end
+        task.wait(1)
+        -- spamJump(3)
+        -- if countOwned(myPlot) > 0 then 
+            -- task.spawn(function() sellCheapest(myPlot) end)
+            -- task.wait(6)
+            -- print('collected coins')
+        -- end
 
-    --     local skip = false
-    --     task.spawn(function()
-    --         while countOwned(myPlot) > 0 and not skip do
-    --             sellCheapest(myPlot)
-    --             task.wait(1)
-    --         end
-    --     end)
-    --     task.wait(10)
-    --     skip = true
+        local skip = false
+        task.spawn(function()
+            while countOwned(myPlot) > 0 and not skip do
+                sellCheapest(myPlot)
+                task.wait(1)
+            end
+        end)
+        task.wait(10)
+        skip = true
 
-    --     task.wait(1)
-    --     if countOwned(myPlot) <= 6 then
-    --         autoFish()
-    --     end
-    --     task.wait(3)
-    -- end
+        task.wait(1)
+        if countOwned(myPlot) <= 6 then
+            autoFish()
+        end
+        task.wait(3)
+    end
     
     if cashValue and cashValue.Value and cashValue.Value >= 500000 then
         local skip = false
