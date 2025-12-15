@@ -8,18 +8,6 @@ local VIM = game:GetService("VirtualInputManager")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
-
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local backpack = player:WaitForChild("Backpack")
-
-local net = require(RS.Packages.Net);
-local Sell = net:RemoteEvent("PlotService/Sell");
-local CastEvent = net:RemoteEvent("FishingRod.Cast")
-local CancelEvent = net:RemoteEvent("FishingRod.Cancel")
-local MinigameClick = net:RemoteEvent("FishingRod.MinigameClick")
-local ClaimEvent = net:RemoteFunction("AdventService/ClaimReward");
-
 local function waitForPath(parent, ...)
     local cur = parent
     for _, name in ipairs({...}) do
@@ -146,12 +134,11 @@ local function parsePrice(txt)
 end
 
 local leaderstats = waitForPath(player, "leaderstats")
-local rebirths, cashValue
+local cashValue
 task.spawn(function()
     while true do
         if player:FindFirstChild("leaderstats") then
             cashValue = player.leaderstats:FindFirstChild("Cash")
-            rebirths = player.leaderstats:FindFirstChild("Rebirths")
         end
         task.wait(1)
     end
@@ -316,11 +303,10 @@ local function sellCheapest(plot)
         local pr = podiumPrice(pod)
         local prompt = podiumPrompt(pod)
         if prompt then
-            table.insert(entries, {pod=pod, price=pr, prompt=prompt, index = tonumber(pod.Name)})
+            table.insert(entries, {pod=pod, price=pr, prompt=prompt})
         end
     end
     table.sort(entries, function(a,b) return a.price < b.price end)
-    print(#entries)
     if #entries==0 then return end
 
     local cheapest = entries[1].price
@@ -331,15 +317,6 @@ local function sellCheapest(plot)
                 if walkToDynamic(e.prompt, 3, 20) then
                     task.wait(0.5)
                     local success = firePrompt(e.prompt, 1, Enum.KeyCode.F, 3.5)
-                    task.wait(0.5)
-                    Sell:FireServer(e.index)
-                    print("sell ", e.index)
-                    task.spawn(function()
-                        for i=1,3 do
-                            task.wait(0.5)
-                            Sell:FireServer(e.index)
-                        end
-                    end)
                     if success then break end
                 end
                 retries += 1
@@ -375,44 +352,6 @@ local function rebirth()
     end
 end
 
-local function hasTool(toolName)
-    return backpack:FindFirstChild(toolName) ~= nil
-end
-
-local function equipTool(toolName)
-    local tool = backpack:FindFirstChild(toolName)
-    if tool then
-        humanoid:EquipTool(tool)
-        return tool
-    end
-    return nil
-end
-
-local function autoFish()
-    local fishingRod = equipTool("Fishing Rod")
-    if not fishingRod then
-        print("No fishing rod in eq (Is flood active?)")
-        return
-    end
-    fishingRod:Activate()
-    task.wait(2)
-    CastEvent:FireServer(1)
-
-    repeat 
-        task.wait(0.1)
-    until fishingRod:GetAttribute("minigame")
-
-    while fishingRod:GetAttribute("minigame") do
-        if fishingRod:GetAttribute("minigame") then
-            MinigameClick:FireServer()
-        end
-        task.wait(0.1)
-    end
-    task.wait(0.5)
-    humanoid:UnequipTools()
-    -- CancelEvent:FireServer()
-end
-
 local myPlot = ensureMyPlot()
 task.wait(1)
 
@@ -421,96 +360,16 @@ while true do
         myPlot = ensureMyPlot()
     end
 
-    if rebirths and rebirths.Value and rebirths.Value >= 1 then
-        pcall(function() player:Kick("done") end)
-        break
-    end
-
-    while not cashValue do
-        task.wait(1)
-    end
-
-    -- if cashValue.Value < 500000 then
-    --     for i=1, 6 do
-    --         ClaimEvent:InvokeServer("Calendar", i);
-    --         task.wait(0.2)
-    --     end
-    --     task.wait(0.1)
-    --     sellCheapest(myPlot)
-    --     -- task.wait(5)
-    -- end
-
-    -- while cashValue.Value < 500000 do
-    --     task.wait(1)
-    --     sellCheapest(myPlot)
-    -- end
-
-    -- while not hasTool("Fishing Rod") do
-    --     print("Flood not active...")
-    --     task.wait(2)
-    -- end
-    -- print("Flood started")
-
-    while cashValue.Value < 500000 do
-        local lockButton = myPlot:WaitForChild("Purchases"):FindFirstChild("PlotBlock"):FindFirstChild("Main")
-        -- if isBasePart(lockButton) then
-        --     walkToDynamic(lockButton, 3, 10)
-        -- end
-        task.wait(1)
-        -- spamJump(3)
-        -- if countOwned(myPlot) > 0 then 
-            -- task.spawn(function() sellCheapest(myPlot) end)
-            -- task.wait(6)
-            -- print('collected coins')
-        -- end
-
-        local skip = false
-        task.spawn(function()
-            while countOwned(myPlot) > 0 and not skip do
-                sellCheapest(myPlot)
-                task.wait(1)
-            end
-        end)
-        task.wait(10)
-        skip = true
-
-        task.wait(1)
-        if countOwned(myPlot) <= 6 then
-            autoFish()
-        end
-        task.wait(3)
-    end
-    
     if cashValue and cashValue.Value and cashValue.Value >= 500000 then
-        local skip = false
-        task.spawn(function()
-            while countOwned(myPlot) > 0 and not skip do
-                sellCheapest(myPlot)
-                task.wait(1)
-            end
-        end)
-        task.wait(10)
-        skip = true
+        
+        while countOwned(myPlot) > 0 do
+            sellCheapest(myPlot)
+            task.wait(1)
+        end
+
         while not hasRequired(myPlot) do
-            local skip = false
-            task.spawn(function()
-                while countOwned(myPlot) > 6 and not skip do
-                    sellCheapest(myPlot)
-                    task.wait(1)
-                end
-            end)
-            task.wait(5)
-            skip = true
             local animals = getMovingAnimals()
             for _, entry in ipairs(animals) do
-                local y = math.abs(entry.part.Orientation.Y)
-                if not y then 
-                    print('no orientation???/')
-                end
-
-                if y < 175.0 or y > 185.0 then
-                    continue
-                end
                 local oh = entry.model:FindFirstChild("AnimalOverhead", true)
                 local dn = oh and (oh:FindFirstChild("DisplayName") or oh:FindFirstChild("Name"))
                 local name = dn and dn.Text or ""
@@ -540,35 +399,35 @@ while true do
         break
     end
 
-    -- local owned = countOwned(myPlot)
-    -- if owned >= 10 then
-    --     collectCoins(myPlot)
-    --     sellCheapest(myPlot)
-    --     task.wait(1.9)
-    -- else
-    --     local best = bestAffordable()
-    --     if best and isBasePart(best.part) and best.prompt then
-    --         if walkToDynamic(best.prompt, 2.5, 20) then
-    --             firePrompt(best.prompt, 3, Enum.KeyCode.E)
-    --             task.wait(0.3)
-    --         else
-    --             if cashValue and cashValue.Value and cashValue.Value <= 25 then
-    --                 spamJump(10)
-    --                 task.wait(2.5)
-    --                 collectCoins(myPlot)
-    --             else
-    --                 task.wait(0.5)
-    --             end
-    --         end
-    --     else
-    --         if cashValue and cashValue.Value and cashValue.Value <= 25 then
-    --             spamJump(10)
-    --             task.wait(2.5)
-    --             collectCoins(myPlot)
-    --         else
-    --             task.wait(0.5)
-    --         end
-    --     end
-    -- end
+    local owned = countOwned(myPlot)
+    if owned >= 10 then
+        collectCoins(myPlot)
+        sellCheapest(myPlot)
+        task.wait(1.9)
+    else
+        local best = bestAffordable()
+        if best and isBasePart(best.part) and best.prompt then
+            if walkToDynamic(best.prompt, 2.5, 20) then
+                firePrompt(best.prompt, 3, Enum.KeyCode.E)
+                task.wait(0.3)
+            else
+                if cashValue and cashValue.Value and cashValue.Value <= 25 then
+                    spamJump(10)
+                    task.wait(2.5)
+                    collectCoins(myPlot)
+                else
+                    task.wait(0.5)
+                end
+            end
+        else
+            if cashValue and cashValue.Value and cashValue.Value <= 25 then
+                spamJump(10)
+                task.wait(2.5)
+                collectCoins(myPlot)
+            else
+                task.wait(0.5)
+            end
+        end
+    end
     task.wait(0.4)
 end
