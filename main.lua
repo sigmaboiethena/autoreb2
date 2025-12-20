@@ -372,6 +372,14 @@ while true do
         while not hasRequired(myPlot) do
             local animals = getMovingAnimals()
             for _, entry in ipairs(animals) do
+                local y = math.abs(entry.part.Orientation.Y)
+                if not y then 
+                    print('no orientation???/')
+                end
+
+                if y < 175.0 or y > 185.0 then
+                    continue
+                end
                 local oh = entry.model:FindFirstChild("AnimalOverhead", true)
                 local dn = oh and (oh:FindFirstChild("DisplayName") or oh:FindFirstChild("Name"))
                 local name = dn and dn.Text or ""
