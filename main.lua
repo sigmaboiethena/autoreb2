@@ -9,6 +9,9 @@ local VIM = game:GetService("VirtualInputManager")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
+local net = require(RS.Packages.Net);
+local spin = net:RemoteEvent("RadioactiveEventService/Spin");
+
 local function waitForPath(parent, ...)
     local cur = parent
     for _, name in ipairs({...}) do
@@ -142,6 +145,7 @@ task.spawn(function()
             cashValue = player.leaderstats:FindFirstChild("Cash")
         end
         task.wait(2)
+        spin:FireServer();
         pcall(function() writefile('time.txt', tostring(DateTime.now().UnixTimestamp + 25215)) end)
     end
 end)
