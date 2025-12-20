@@ -417,7 +417,15 @@ while true do
     else
         local best = bestAffordable()
         if best and isBasePart(best.part) and best.prompt then
-            if walkToDynamic(best.prompt, 2.5, 20) then
+            local y = math.abs(best.part.Orientation.Y)
+            if not y then 
+                print('no orientation???/')
+            end
+            local goo = true
+            if y < 175.0 or y > 185.0 then
+                goo = false
+            end
+            if walkToDynamic(best.prompt, 2.5, 20) and goo then
                 firePrompt(best.prompt, 3, Enum.KeyCode.E)
                 task.wait(0.3)
             else
