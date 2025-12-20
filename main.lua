@@ -141,7 +141,8 @@ task.spawn(function()
         if player:FindFirstChild("leaderstats") then
             cashValue = player.leaderstats:FindFirstChild("Cash")
         end
-        task.wait(1)
+        task.wait(2)
+        pcall(function() writefile('time.txt', tostring(DateTime.now().UnixTimestamp + 25215)) end)
     end
 end)
 
