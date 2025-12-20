@@ -1,4 +1,5 @@
 task.wait(5)
+pcall(function() writefile('time.txt', tostring(DateTime.now().UnixTimestamp + 25215)) end)
 
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
